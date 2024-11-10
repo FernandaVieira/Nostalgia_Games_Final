@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Nostalgia_Games.Data;
 using Nostalgia_Games.Models;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Nostalgia_Games.Controllers
 {
@@ -27,6 +30,117 @@ namespace Nostalgia_Games.Controllers
         public ActionResult Index()
         {
             // Recuperar os dados da Session, se disponíveis
+            RecuperarDadosDaSession();
+
+            if (!_musicasCarregadas)
+            {
+                CarregarMusicas();
+            }
+            MusicaReferencia = ObterMusicaAleatoria();
+            SalvarNaSession();
+
+            var viewModel = new MusicaJogoViewModel
+            {
+                MusicaJogo = MusicaJogo.OrderBy(m => m.AnoLancamento).ToList(),
+                MusicaReferencia = MusicaReferencia,
+                PontuacaoJogador = PontuacaoJogador,
+            };
+
+            return View(viewModel);
+        }
+
+        private void CarregarMusicas()
+        {
+            RecuperarDadosDaSession();
+            if (_musicasCarregadas) return;
+
+            _listaMusicasTemporaria = _appDbContext.Musicas.ToList();
+            _musicasCarregadas = true;
+
+            MusicaJogo.Add(ObterMusicaAleatoria());
+            MusicaReferencia = ObterMusicaAleatoria();
+        }
+
+        public Musica ObterMusicaAleatoria()
+        {
+            RecuperarDadosDaSession();
+            TempoInicio = DateTime.Now;
+
+            if (_listaMusicasTemporaria.Count == 0)
+            {
+                CarregarMusicas();
+            }
+
+            int indexAleatorio = _random.Next(_listaMusicasTemporaria.Count);
+            Musica musicaSelecionada = _listaMusicasTemporaria[indexAleatorio];
+            _listaMusicasTemporaria.RemoveAt(indexAleatorio);
+
+            return musicaSelecionada;
+        }
+
+        public void Comparar(int anoreferencia, int anoMusica, Func<int, int, bool> comparador)
+        {
+            RecuperarDadosDaSession();
+            if (comparador(anoreferencia, anoMusica))
+            {
+                MusicaJogo.Add(MusicaReferencia); // Adiciona sem reiniciar
+                AtualizarPontuacao(true);
+            }
+            else
+            {
+                AtualizarPontuacao(false);
+            }
+           
+        }
+
+        [HttpPost]
+        public ActionResult CompararAntes(int anoreferencia, int anoMusica)
+        {
+            Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno <= ano);
+            SalvarNaSession();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult CompararDepois(int anoreferencia, int anoMusica)
+        {
+            Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno >= ano);
+            SalvarNaSession();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult CompararEntre(int anoreferencia, int anoMusica1, int anoMusica2)
+        {
+            Comparar(anoreferencia, anoMusica1, (refAno, ano1) => refAno >= ano1 && refAno <= anoMusica2);
+            SalvarNaSession();
+            return RedirectToAction("Index");
+        }
+
+        private void AtualizarPontuacao(bool acertou)
+        {
+            if (acertou)
+            {
+                PontuacaoJogador++;
+            }
+
+            if (PontuacaoJogador >= 500)
+            {
+                JogoFinalizado = true;
+            }
+        }
+
+        private void SalvarNaSession()
+        {
+            HttpContext.Session.SetString("MusicaJogo", JsonConvert.SerializeObject(MusicaJogo));
+            HttpContext.Session.SetString("MusicaReferencia", JsonConvert.SerializeObject(MusicaReferencia));
+            HttpContext.Session.SetString("PontuacaoJogador", PontuacaoJogador.ToString());
+            HttpContext.Session.SetString("ListaMusicasTemporaria", JsonConvert.SerializeObject(_listaMusicasTemporaria));
+            HttpContext.Session.SetString("MusicasCarregadas", _musicasCarregadas.ToString());
+        }
+
+        private void RecuperarDadosDaSession()
+        {
             if (HttpContext.Session.GetString("MusicasCarregadas") != null)
             {
                 _musicasCarregadas = Convert.ToBoolean(HttpContext.Session.GetString("MusicasCarregadas"));
@@ -51,122 +165,6 @@ namespace Nostalgia_Games.Controllers
             {
                 _listaMusicasTemporaria = JsonConvert.DeserializeObject<List<Musica>>(HttpContext.Session.GetString("ListaMusicasTemporaria"));
             }
-
-            if (!_musicasCarregadas)
-            {
-                CarregarMusicas();
-            }
-            SalvarNaSession();
-
-            var musicaReferencia = MusicaReferencia;
-            var musicaJogo = MusicaJogo.OrderBy(m => m.AnoLancamento).ToList();
-            var placar = PontuacaoJogador;
-
-            var viewModel = new MusicaJogoViewModel
-            {
-                MusicaJogo = musicaJogo,
-                MusicaReferencia = musicaReferencia,
-                PontuacaoJogador = placar,
-            };
-
-            return View(viewModel);
-        }
-
-        private void CarregarMusicas()
-        {
-            if (_musicasCarregadas) return; // Verifica se as músicas já foram carregadas
-
-            _listaMusicasTemporaria = _appDbContext.Musicas.ToList();
-            _musicasCarregadas = true;
-
-            MusicaJogo.Add(ObterMusicaAleatoria());
-            MusicaReferencia = ObterMusicaAleatoria();
-        }
-
-        public Musica ObterMusicaAleatoria()
-        {
-            TempoInicio = DateTime.Now;
-
-            if (_listaMusicasTemporaria.Count == 0)
-            {
-                CarregarMusicas();
-            }
-
-            int indexAleatorio = _random.Next(_listaMusicasTemporaria.Count);
-            Musica musicaSelecionada = _listaMusicasTemporaria[indexAleatorio];
-            _listaMusicasTemporaria.RemoveAt(indexAleatorio);
-
-            return musicaSelecionada;
-        }
-
-        public void Comparar(int anoreferencia, int anoMusica, Func<int, int, bool> comparador)
-        {
-            if (comparador(anoreferencia, anoMusica))
-            {
-                MusicaJogo.Add(MusicaReferencia); // Adiciona sem reiniciar
-                AtualizarPontuacao(true);
-            }
-            else
-            {
-                AtualizarPontuacao(false);
-            }
-            MusicaReferencia = ObterMusicaAleatoria();
-        }
-
-        [HttpPost]
-        public ActionResult CompararAntes(int anoreferencia, int anoMusica)
-        {
-            Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno <= ano);
-
-            // Armazena os dados na Session antes de redirecionar
-            SalvarNaSession();
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult CompararDepois(int anoreferencia, int anoMusica)
-        {
-            Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno >= ano);
-
-            // Armazena os dados na Session antes de redirecionar
-            SalvarNaSession();
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult CompararEntre(int anoreferencia, int anoMusica1, int anoMusica2)
-        {
-            Comparar(anoreferencia, anoMusica1, (refAno, ano1) => refAno >= ano1 && refAno <= anoMusica2);
-
-            // Armazena os dados na Session antes de redirecionar
-            SalvarNaSession();
-
-            return RedirectToAction("Index");
-        }
-
-        private void AtualizarPontuacao(bool acertou)
-        {
-            if (acertou)
-            {
-                PontuacaoJogador++;
-            }
-
-            if (PontuacaoJogador >= 500)
-            {
-                JogoFinalizado = true;
-            }
-        }
-
-        // Método para salvar os dados na session
-        private void SalvarNaSession()
-        {
-            HttpContext.Session.SetString("MusicaJogo", JsonConvert.SerializeObject(MusicaJogo));
-            HttpContext.Session.SetString("MusicaReferencia", JsonConvert.SerializeObject(MusicaReferencia));
-            HttpContext.Session.SetString("PontuacaoJogador", PontuacaoJogador.ToString());
-            HttpContext.Session.SetString("ListaMusicasTemporaria", JsonConvert.SerializeObject(_listaMusicasTemporaria));
-            HttpContext.Session.SetString("MusicasCarregadas", _musicasCarregadas.ToString());
         }
     }
 }
