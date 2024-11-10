@@ -1,0 +1,135 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+
+.cards {
+    display: flex; /* Utiliza flexbox para organizar as cartas */
+    justify-content: center; /* Centraliza as cartas horizontalmente */
+    gap: 20px; /* Espa?amento de 20px entre as cartas */
+    margin-top: 40px; /* Adiciona 40px de espa?o acima das cartas */
+}
+
+.card {
+    background-color: white; /* Define a cor de fundo da carta como branco */
+    border-radius: 20px; /* Arredonda os cantos da carta com 20px */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra suave ? carta */
+    text-align: center; /* Centraliza o texto dentro da carta */
+    padding: 20px; /* Adiciona espa?amento interno de 20px */
+    width: 250px; /* Define a largura da carta como 250px */
+}
+
+    .card img {
+        border-radius: 10px; /* Arredonda os cantos das imagens dentro das cartas */
+    }
+
+    .card h2 {
+        font-size: 22px; /* Define o tamanho da fonte dos t?tulos (h2) como 22px */
+        margin: 20px 0 10px; /* Adiciona margem de 20px acima, 10px abaixo e 0px nas laterais */
+    }
+
+    .card p {
+        font-size: 16px; /* Define o tamanho da fonte dos par?grafos como 16px */
+    }
+
+    .card a, .card button {
+        background-color: #ff5252; /* Define a cor de fundo dos bot?es e links como vermelho */
+        color: white; /* Define a cor do texto como branco */
+        border: none; /* Remove qualquer borda dos bot?es e links */
+        padding: 10px 20px; /* Adiciona 10px de espa?o vertical e 20px de espa?o horizontal */
+        border-radius: 20px; /* Arredonda os cantos com 20px */
+        cursor: pointer; /* Define o cursor como pointer (m?ozinha) ao passar sobre o elemento */
+        display: inline-block; /* Exibe os bot?es e links como elementos inline-bloco */
+        text-decoration: none; /* Remove a sublinha dos links */
+        font-size: 16px; /* Define o tamanho da fonte dos bot?es e links como 16px */
+    }
+
+        .card button:hover, .card a:hover {
+            background-color: #ff1744; /* Altera a cor de fundo para um vermelho mais escuro ao passar o mouse */
+        }
+
+.cartas-jogo {
+    display: flex; /* Utiliza flexbox para organizar as cartas e bot?es */
+    /* Distribui os elementos uniformemente com espa?os iguais */
+    align-items: center; /* Alinha verticalmente os elementos no centro do container */
+    gap: 20px; /* Espa?o entre os elementos */
+    margin: 20px; /* Adiciona 20px de margem ao redor do container */
+    flex-wrap: wrap; /* Permite que os elementos quebrem a linha quando n?o houver espa?o suficiente */
+    max-width: 100%;
+    overflow-x: auto; /* Permite rolagem horizontal se necess?rio */
+    transition: width 0.3s ease; /* Transi??o suave para o redimensionamento */
+}
+
+.carta {
+    top: 50%;
+    border: 2px solid #000; /* Adiciona uma borda preta de 2px ao redor da carta */
+    padding: 10px; /* Espa?amento interno de 10px entre o conte?do e a borda */
+    text-align: center; /* Centraliza o conte?do da carta */
+    background-image: url(../images/image_4.jpeg); /* Define uma imagem de fundo para a carta */
+    background-size: cover; /* Ajusta a imagem de fundo para cobrir toda a carta */
+    /*background-position: center;*/ /* (Comentado) Define a posi??o da imagem de fundo no centro */
+    color: white; /* Define a cor do texto como branco */
+    font-weight: bold; /* Define o texto como negrito */
+    border-radius: 15px; /* Arredonda os cantos da carta com 15px */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra ? carta */
+    width: 200px; /* Define a largura da carta como 200px */
+}
+
+.botao-entre, .botao-antes, .botao-depois {
+    font-size: 16px; /* Define o tamanho da fonte dos bot?es como 14px */
+    background-color: #ff5252; /* Define a cor de fundo dos bot?es como vermelho */
+    color: white; /* Define a cor do texto dos bot?es como branco */
+    border: none; /* Remove qualquer borda dos bot?es */
+    border-radius: 20px; /* Arredonda os cantos dos bot?es com 20px */
+    width: 80px;
+    height: 50px;
+}
+
+
+.modal {
+    position: fixed; /* Define a posi??o do modal como fixa na tela */
+    transform: translate(-50%, -50%); /* Centraliza o modal, ajustando sua posi??o em rela??o ao centro */
+    background-color: white; /* Define a cor de fundo do modal como branco */
+    padding: 30px; /* Adiciona 30px de espa?amento interno ao modal */
+    border: 2px solid #000; /* Adiciona uma borda preta de 2px ao modal */
+    z-index: 1000; /* Define a prioridade do modal sobre outros elementos da p?gina */
+    text-align: center; /* Centraliza o conte?do textual dentro do modal */
+    width: 300px; /* Define a largura do modal como 100px */
+}
+
+    .modal h2 {
+        font-size: 24px; /* Define o tamanho da fonte dos t?tulos (h2) dentro do modal como 24px */
+        margin-bottom: 15px; /* Adiciona 15px de margem abaixo do t?tulo */
+    }
+
+    .modal button {
+        margin: 5px; /* Define uma margem de 5px ao redor dos bot?es dentro do modal */
+    }
+
+.musica_container {
+    background-color: white; /* Define a cor de fundo da carta como branco */
+    border-radius: 20px; /* Arredonda os cantos da carta com 20px */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra suave ? carta */
+    text-align: center; /* Centraliza o texto dentro da carta */
+    padding: 20px; /* Adiciona espa?amento interno de 20px */
+    width: 350px;
+}

@@ -1,0 +1,87 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Nostalgia_Games.Models.MusicaJogoViewModel
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Trivia Musical";
+}
+
+<link href="css/site.css" rel="stylesheet" />
+
+<main>
+    <div class="text-center">
+        <h3>Trivia Musical</h3>
+        <p>Pontuação: @Model.PontuacaoJogador</p>
+    </div>
+
+    <div class="musica_container">
+        <iframe id="player-musica" src="https://www.youtube.com/embed/@(Model.MusicaReferencia.IdMusica)?autoplay=1" allow="autoplay"></iframe>
+    </div>
+ 
+
+    <div class="cartas-jogo">
+        @foreach (var musica in Model.MusicaJogo)
+        {
+            // Renderizar o formulário para a primeira carta com o botão "Antes"
+            if (Model.MusicaJogo.IndexOf(musica) == 0)
+            {
+                <p>@Model.MusicaReferencia.AnoLancamento</p>
+
+                <form method="post" asp-action="CompararAntes">
+                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
+                    <input type="hidden" name="anoMusica" value="@musica.AnoLancamento" />
+                    <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Antes</a>
+                </form>
+
+            }
+
+            // Renderizar a carta
+            <div class="carta">
+                <p style="font-size: 16px;">@musica.NomeDoCantor</p>
+                <p style="font-size: 56px;">@musica.AnoLancamento</p>
+                <p style="font-size: 14px;">@musica.NomeDaMusica</p>
+            </div>
+
+            // Renderizar o botão "Entre" entre as cartas
+            if (Model.MusicaJogo.IndexOf(musica) != Model.MusicaJogo.Count - 1 &&
+            musica.AnoLancamento != Model.MusicaJogo[Model.MusicaJogo.IndexOf(musica) + 1].AnoLancamento)
+            {
+
+
+                <form method="post" asp-action="CompararEntre">
+                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
+                    <input type="hidden" name="anoMusica" value="@musica.AnoLancamento" />
+                    <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Entre</a>
+                </form>
+
+            }
+        }
+
+        @if (Model.MusicaJogo.Any())
+        {
+
+            <form method="post" asp-action="CompararDepois">
+                <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
+                <input type="hidden" name="anoMusica" value="@Model.MusicaJogo.Last().AnoLancamento" />
+                <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Depois</a>
+            </form>
+
+        }
+
+
+
+
+        @*  @if (Model.JogoFinalizado)
+        {
+        <div class="modal" style="display:block; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
+        <h2>@MensagemVitoria</h2>
+        <p>Escolha uma opção:</p>
+        <button class="btn btn-primary" onclick="location.reload()">Jogar Novamente</button>
+        <button class="btn btn-secondary" @onclick="MudarDeJogo">Mudar de Jogo</button>
+        </div>
+        } *@
+
+    </div>
+</main>
