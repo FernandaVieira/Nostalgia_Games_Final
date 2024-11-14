@@ -27,7 +27,7 @@
             // Renderizar o formulário para a primeira carta com o botão "Antes"
             if (Model.MusicaJogo_.IndexOf(musica) == 0)
             {
-                <p>@Model.MusicaReferencia_.AnoLancamento</p>
+                @* <p>@Model.MusicaReferencia_.AnoLancamento</p> *@
 
                 <form method="post" asp-action="CompararAntes">
                     <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia_.AnoLancamento" />

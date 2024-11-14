@@ -1,23 +1,23 @@
-﻿try {
-    const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
-    console.log(permissionStatus.state);
-} catch (error) {
-    if (error instanceof TypeError) {
-        console.warn("Erro ignorado: ", error.message);
-    } else {
-        throw error; // Lança outros erros que não são TypeError
+﻿window.onerror = function () {
+    return true; // Retorna true para suprimir todos os erros no console
+};
+
+function tocarNovaMusica() {
+    if (MusicaReferencia.Any()) {
+        let novaIdMusica = @MusicaReferencia.IdMusica;
+        document.getElementById('player-musica').src = "https://www.youtube.com/embed/" + novaIdMusica + "?autoplay=1";
+    }
+    else {
+        adicionarNovaCarta();
     }
 }
 
-try {
-    // Coloque aqui o código que está gerando o erro
-    // Por exemplo, se estiver usando uma função específica:
-    Index();
-} catch (error) {
-    if (error instanceof TypeError) {
-        console.warn("Erro TypeError ignorado: ", error.message);
-    } else {
-        console.error("Erro inesperado: ", error);
-        throw error; // Opcional: relança outros erros, se necessário
-    }
-}
+navigator.permissions.query({ name: 'geolocation' })
+    .then(result => {
+        // Manipule a resposta
+        console.log(result.state);
+    })
+    .catch(error => {
+        console.error('Erro ao executar o query:', error);
+    });
+
