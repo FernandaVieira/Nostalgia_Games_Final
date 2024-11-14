@@ -119,16 +119,34 @@ namespace Nostalgia_Games.Controllers
         public ActionResult CompararEntre(int anoreferencia, int anoMusica1)
         {
             RecuperarDadosDaSession();
-            var anoMusica1_ = MusicaJogo[anoMusica1].AnoLancamento;
-            var anoMusica2_ = MusicaJogo[anoMusica1 + 1].AnoLancamento;
-            for (int i = 1; anoMusica1_ != anoMusica2_; i++)
+
+            var ultimoAnoReferencia = anoreferencia;
+
+            // Ordenar MusicaJogo por AnoLancamento (caso não esteja ordenado)
+            var MusicaJogoOrdenada = MusicaJogo.OrderBy(m => m.AnoLancamento).ToList();
+
+            // Encontrar dois anos consecutivos em MusicaJogoOrdenada que cercam o ultimoAnoReferencia
+            for (int i = 0; i < MusicaJogoOrdenada.Count - 1; i++)
             {
-                
-                anoMusica2_ = MusicaJogo[anoMusica1 + i].AnoLancamento;
+                int anoAnterior = MusicaJogoOrdenada[i].AnoLancamento;
+                int anoPosterior = MusicaJogoOrdenada[i + 1].AnoLancamento;
+
+                // Verificar se ultimoAnoReferencia está entre anoAnterior e anoPosterior
+                if (ultimoAnoReferencia >= anoAnterior && ultimoAnoReferencia <= anoPosterior)
+                {
+                    // Está entre os dois anos
+                    MusicaJogo.Add(MusicaReferencia);
+                    
+                    AtualizarPontuacao(true); // Atualiza a pontuação com resposta correta
+
+                    MusicaReferencia = ObterMusicaAleatoria();
+                    SalvarNaSession();
+                    return RedirectToAction("Index");
+                }
             }
-
-
-            Comparar(anoreferencia, anoMusica1_, (refAno, ano1) => refAno >= ano1 && refAno <= anoMusica2_);
+            // Caso o ultimoAnoReferencia não esteja entre dois anos
+            // Resposta incorreta
+            AtualizarPontuacao(false); 
             MusicaReferencia = ObterMusicaAleatoria();
             SalvarNaSession();
             return RedirectToAction("Index");
