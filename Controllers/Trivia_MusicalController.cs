@@ -13,7 +13,7 @@ namespace Nostalgia_Games.Controllers
     {
         private readonly AppDbContext _appDbContext;
         private Random _random = new Random();
-        private bool _musicasCarregadas = false;
+        
 
         public List<Musica> MusicaJogo { get; private set; } = new List<Musica>();
         public Musica MusicaReferencia { get; private set; } = new Musica();
@@ -21,29 +21,31 @@ namespace Nostalgia_Games.Controllers
         public DateTime TempoInicio { get; private set; }
         public int PontuacaoJogador { get; private set; }
         public bool JogoFinalizado { get; private set; } = false;
+        public bool _musicasCarregadas { get; private set; }
 
         public Trivia_MusicalController(AppDbContext context)
         {
-            _appDbContext = context;
+            if(!_musicasCarregadas) _appDbContext = context;
+            
         }
 
         public ActionResult Index()
         {
             // Recuperar os dados da Session, se disponíveis
-            RecuperarDadosDaSession();
+            //RecuperarDadosDaSession();
 
             if (!_musicasCarregadas)
             {
                 CarregarMusicas();
             }
-            MusicaReferencia = ObterMusicaAleatoria();
+            //MusicaReferencia = ObterMusicaAleatoria();
             SalvarNaSession();
-
+                        
             var viewModel = new MusicaJogoViewModel
             {
-                MusicaJogo = MusicaJogo.OrderBy(m => m.AnoLancamento).ToList(),
-                MusicaReferencia = MusicaReferencia,
-                PontuacaoJogador = PontuacaoJogador,
+                MusicaJogo_ = MusicaJogo.OrderBy(m => m.AnoLancamento).ToList(),
+                MusicaReferencia_ = MusicaReferencia,
+                PontuacaoJogador_ = PontuacaoJogador,
             };
 
             return View(viewModel);
@@ -63,8 +65,8 @@ namespace Nostalgia_Games.Controllers
 
         public Musica ObterMusicaAleatoria()
         {
-            RecuperarDadosDaSession();
-            TempoInicio = DateTime.Now;
+            
+            //TempoInicio = DateTime.Now;
 
             if (_listaMusicasTemporaria.Count == 0)
             {
@@ -80,7 +82,7 @@ namespace Nostalgia_Games.Controllers
 
         public void Comparar(int anoreferencia, int anoMusica, Func<int, int, bool> comparador)
         {
-            RecuperarDadosDaSession();
+            //RecuperarDadosDaSession();
             if (comparador(anoreferencia, anoMusica))
             {
                 MusicaJogo.Add(MusicaReferencia); // Adiciona sem reiniciar
@@ -96,7 +98,9 @@ namespace Nostalgia_Games.Controllers
         [HttpPost]
         public ActionResult CompararAntes(int anoreferencia, int anoMusica)
         {
+            RecuperarDadosDaSession();
             Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno <= ano);
+            MusicaReferencia = ObterMusicaAleatoria();
             SalvarNaSession();
             return RedirectToAction("Index");
         }
@@ -104,15 +108,28 @@ namespace Nostalgia_Games.Controllers
         [HttpPost]
         public ActionResult CompararDepois(int anoreferencia, int anoMusica)
         {
+            RecuperarDadosDaSession();
             Comparar(anoreferencia, anoMusica, (refAno, ano) => refAno >= ano);
+            MusicaReferencia = ObterMusicaAleatoria();
             SalvarNaSession();
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public ActionResult CompararEntre(int anoreferencia, int anoMusica1, int anoMusica2)
+        public ActionResult CompararEntre(int anoreferencia, int anoMusica1)
         {
-            Comparar(anoreferencia, anoMusica1, (refAno, ano1) => refAno >= ano1 && refAno <= anoMusica2);
+            RecuperarDadosDaSession();
+            var anoMusica1_ = MusicaJogo[anoMusica1].AnoLancamento;
+            var anoMusica2_ = MusicaJogo[anoMusica1 + 1].AnoLancamento;
+            for (int i = 1; anoMusica1_ != anoMusica2_; i++)
+            {
+                
+                anoMusica2_ = MusicaJogo[anoMusica1 + i].AnoLancamento;
+            }
+
+
+            Comparar(anoreferencia, anoMusica1_, (refAno, ano1) => refAno >= ano1 && refAno <= anoMusica2_);
+            MusicaReferencia = ObterMusicaAleatoria();
             SalvarNaSession();
             return RedirectToAction("Index");
         }
@@ -121,7 +138,7 @@ namespace Nostalgia_Games.Controllers
         {
             if (acertou)
             {
-                PontuacaoJogador++;
+                PontuacaoJogador += 100;
             }
 
             if (PontuacaoJogador >= 500)

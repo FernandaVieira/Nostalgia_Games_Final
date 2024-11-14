@@ -12,9 +12,9 @@
 
     public class MusicaJogoViewModel
     {
-        public int PontuacaoJogador { get; set; }
-        public Musica MusicaReferencia { get; set; }
-        public List<Musica> MusicaJogo { get; set; }        
+        public int PontuacaoJogador_ { get; set; }
+        public Musica MusicaReferencia_ { get; set; }
+        public List<Musica> MusicaJogo_ { get; set; }        
         
 
 

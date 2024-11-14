@@ -13,24 +13,24 @@
 <main>
     <div class="text-center">
         <h3>Trivia Musical</h3>
-        <p>Pontuação: @Model.PontuacaoJogador</p>
+        <p>Pontuação: @Model.PontuacaoJogador_</p>
     </div>
 
     <div class="musica_container">
-        <iframe id="player-musica" src="https://www.youtube.com/embed/@(Model.MusicaReferencia.IdMusica)?autoplay=1" allow="autoplay"></iframe>
+        <iframe id="player-musica" src="https://www.youtube.com/embed/@(Model.MusicaReferencia_.IdMusica)?autoplay=1" allow="autoplay"></iframe>
     </div>
- 
+
 
     <div class="cartas-jogo">
-        @foreach (var musica in Model.MusicaJogo)
+        @foreach (var musica in Model.MusicaJogo_)
         {
             // Renderizar o formulário para a primeira carta com o botão "Antes"
-            if (Model.MusicaJogo.IndexOf(musica) == 0)
+            if (Model.MusicaJogo_.IndexOf(musica) == 0)
             {
-                <p>@Model.MusicaReferencia.AnoLancamento</p>
+                <p>@Model.MusicaReferencia_.AnoLancamento</p>
 
                 <form method="post" asp-action="CompararAntes">
-                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
+                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia_.AnoLancamento" />
                     <input type="hidden" name="anoMusica" value="@musica.AnoLancamento" />
                     <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Antes</a>
                 </form>
@@ -45,33 +45,39 @@
             </div>
 
             // Renderizar o botão "Entre" entre as cartas
-            if (Model.MusicaJogo.IndexOf(musica) != Model.MusicaJogo.Count - 1 &&
-            musica.AnoLancamento != Model.MusicaJogo[Model.MusicaJogo.IndexOf(musica) + 1].AnoLancamento)
+            if (Model.MusicaJogo_.IndexOf(musica) != Model.MusicaJogo_.Count - 1 &&
+            musica.AnoLancamento != Model.MusicaJogo_[Model.MusicaJogo_.IndexOf(musica) + 1].AnoLancamento)
             {
 
 
                 <form method="post" asp-action="CompararEntre">
-                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
-                    <input type="hidden" name="anoMusica" value="@musica.AnoLancamento" />
+                    <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia_.AnoLancamento" />
+                    <input type="hidden" name="anoMusica1" value="@Model.MusicaJogo_.IndexOf(musica)" />
+                    
                     <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Entre</a>
                 </form>
 
             }
         }
 
-        @if (Model.MusicaJogo.Any())
+        @if (Model.MusicaJogo_.Any())
         {
 
             <form method="post" asp-action="CompararDepois">
-                <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia.AnoLancamento" />
-                <input type="hidden" name="anoMusica" value="@Model.MusicaJogo.Last().AnoLancamento" />
+                <input type="hidden" name="anoreferencia" value="@Model.MusicaReferencia_.AnoLancamento" />
+                <input type="hidden" name="anoMusica" value="@Model.MusicaJogo_.Last().AnoLancamento" />
                 <a href="#" class="link-clicavel" onclick="this.closest('form').submit();">Depois</a>
             </form>
 
         }
 
 
-
+        @if (TempData["AlertMessage"] != null)
+        {
+            <div class="alert alert-@TempData["AlertType"]">
+                @TempData["AlertMessage"]
+            </div>
+        }
 
         @*  @if (Model.JogoFinalizado)
         {
